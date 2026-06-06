@@ -21,6 +21,7 @@ const projectSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
+    isDeleted: false,
     collection: "project",
   },
 );
