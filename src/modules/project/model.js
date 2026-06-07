@@ -1,4 +1,3 @@
-import { z } from "zod";
 import mongoose from "mongoose";
 
 const projectSchema = new mongoose.Schema(
@@ -8,22 +7,50 @@ const projectSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
+
     description: {
       type: String,
       required: true,
       trim: true,
     },
+
     image: {
       type: String,
       required: true,
       trim: true,
     },
+
+    website_link: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+
+    categories: {
+      type: [String],
+      required: true,
+    },
+
+    userId: {
+      type: String,
+      required: true,
+    },
+
+    user_name: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+
+    isDeleted: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true,
-    isDeleted: false,
-    collection: "project",
-  },
+    collection: "projects",
+  }
 );
 
-export default mongoose.model("project", projectSchema);
+export default mongoose.model("Project", projectSchema);
