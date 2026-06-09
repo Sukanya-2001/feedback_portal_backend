@@ -1,7 +1,7 @@
 import project from "./model.js";
 
 class projectRepository {
-  async save(data) {
+  async create(data) {
     let saveData = await project.create(data);
     return saveData;
   }
