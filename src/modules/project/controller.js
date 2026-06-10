@@ -18,13 +18,13 @@ export const createProject = async (req, res) => {
     }
 
     const newData = {
-      project_name: validatedData.project_name,
+      projectName: validatedData.projectName,
       description: validatedData.description,
       image: validatedData.image,
-      website_link: validatedData.website_link,
+      websiteLink: validatedData.websiteLink,
       categories: validatedData.categories,
       userId: user._id,
-      user_name: user.fullname,
+      userName: user.fullName,
     };
     const project = await projectRepository.create(newData);
 

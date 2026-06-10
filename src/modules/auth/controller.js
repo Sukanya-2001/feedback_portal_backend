@@ -31,7 +31,7 @@ export const signUp = async (req, res) => {
       }
       const hashedPassword = await bcrypt.hash(req.body.password.trim(), 10);
       const saveData = {
-        fullname: req.body.fullname.trim(),
+        fullName: req.body.fullName.trim(),
         email: email,
         password: hashedPassword,
       };

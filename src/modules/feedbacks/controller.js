@@ -15,9 +15,9 @@ class FeedbackController {
           });
       } else {
         const savedData = {
-          project_id: validate.data.project_id,
-          user_name: validate.data.user_name,
-          guest_email: validate.data.guest_email,
+          projectId: validate.data.projectId,
+          userName: validate.data.userName,
+          guestEmail: validate.data.guestEmail,
           feedback: validate.data.feedback,
         };
         let data = await FeedbackRepository.save(savedData);
@@ -36,8 +36,8 @@ class FeedbackController {
 
   async getAll(req, res) {
     try {
-      let { project_id } = req.params;
-      let data = await FeedbackRepository.findAll(project_id);
+      let { projectId } = req.params;
+      let data = await FeedbackRepository.findAll(projectId);
       if (data.length > 0) {
         return res
           .status(200)
@@ -52,8 +52,8 @@ class FeedbackController {
 
   async update(req, res) {
     try {
-      const { feedback_id } = req.params;
-      let data = await FeedbackRepository.update(feedback_id, req.body);
+      const { feedbackId } = req.params;
+      let data = await FeedbackRepository.update(feedbackId, req.body);
       if (data && data._id) {
         return res
           .status(200)
@@ -69,8 +69,8 @@ class FeedbackController {
 
   async delete(req, res) {
     try {
-      const { feedback_id } = req.params;
-      let data = await FeedbackRepository.delete(feedback_id);
+      const { feedbackId } = req.params;
+      let data = await FeedbackRepository.delete(feedbackId);
       if (!data) {
         return res.status(404).json({
           message: "Feedback not found",
@@ -87,7 +87,7 @@ class FeedbackController {
 
   async postreply(req, res) {
     try {
-      const { feedback_id } = req.params;
+      const { feedbackId } = req.params;
       if (!req.body.comment?.trim()) {
         return res.status(400).json({ message: "Comment is required" });
       } else {
@@ -97,7 +97,7 @@ class FeedbackController {
             created_at: new Date(),
           },
         };
-        let data = await FeedbackRepository.update(feedback_id, newData);
+        let data = await FeedbackRepository.update(feedbackId, newData);
         if (data && data._id) {
           return res
             .status(201)

@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 const projectSchema = new mongoose.Schema(
   {
-    project_name: {
+    projectName: {
       type: String,
       required: true,
       trim: true,
@@ -20,7 +20,7 @@ const projectSchema = new mongoose.Schema(
       trim: true,
     },
 
-    website_link: {
+    websiteLink: {
       type: String,
       required: true,
       trim: true,
@@ -36,7 +36,7 @@ const projectSchema = new mongoose.Schema(
       required: true,
     },
 
-    user_name: {
+    userName: {
       type: String,
       required: true,
       trim: true,

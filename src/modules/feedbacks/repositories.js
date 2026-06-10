@@ -6,25 +6,25 @@ class FeedbackRepository {
     return savedData;
   }
 
-  async findAll(project_id) {
+  async findAll(projectId) {
     let findData = await Feedback.find({
-      project_id: project_id,
+      projectId: projectId,
       isDeleted: false,
     });
     return findData;
   }
 
-  async update(feedback_id, data) {
+  async update(feedbackId, data) {
     let updatedData = await Feedback.findOneAndUpdate(
-      { _id: feedback_id, isDeleted: false },
+      { _id: feedbackId, isDeleted: false },
       data,
       { new: true },
     );
     return updatedData;
   }
 
-  async delete(feedback_id) {
-    let deletedData = await Feedback.findByIdAndUpdate(feedback_id, {
+  async delete(feedbackId) {
+    let deletedData = await Feedback.findByIdAndUpdate(feedbackId, {
       isDeleted: true,
     });
     return deletedData;

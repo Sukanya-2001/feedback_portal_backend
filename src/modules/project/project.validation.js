@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const projectValidationSchema = z.object({
-  project_name: z
+  projectName: z
     .string()
     .trim()
     .min(1, "Project name is required"),
@@ -16,7 +16,7 @@ export const projectValidationSchema = z.object({
     .trim()
     .min(1, "Image is required"),
 
-  website_link: z
+  websiteLink: z
     .string()
     .url("Invalid website URL"),
 
@@ -25,4 +25,4 @@ export const projectValidationSchema = z.object({
     .min(1, "At least one category is required"),
 
 });
-
+

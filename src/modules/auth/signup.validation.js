@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const signupValidationSchema = z.object({
-  fullname: z
+  fullName: z
     .string()
     .trim()
     .min(1, "Full name is required")
@@ -18,4 +18,4 @@ export const signupValidationSchema = z.object({
     .min(1, "Password is required")
     .min(8, "Password must be at least 8 characters"),
 });
-
+
