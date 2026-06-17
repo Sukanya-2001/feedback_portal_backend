@@ -1,11 +1,12 @@
 import jwt from 'jsonwebtoken';
+import { sendError } from '../utils/response.js';
 
 export const authMiddleware = (req, res, next) => {
     try {
         const authheaders = req.headers.authorization;
 
         if(!authheaders || !authheaders.startsWith('Bearer ')){
-            return res.status(401).json({message:'Access denied or no token provided.'})
+            return sendError(res, 'Access denied or no token provided.', null, 401);
         }
 
         let token = authheaders.split(' ')[1];
@@ -15,6 +16,6 @@ export const authMiddleware = (req, res, next) => {
         next();
 
     } catch (err)  {
-        return res.status(401).json({message: 'Invalid or expired token.'})
+        return sendError(res, 'Invalid or expired token.', null, 401);
     }
 }

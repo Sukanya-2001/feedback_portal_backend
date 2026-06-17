@@ -1,40 +1,39 @@
 import CategoryRepository from "./repositories.js";
+import { sendSuccess, sendError } from "../../utils/response.js";
 
 class CategoryController {
   async create(req, res) {
     try {
       if (!req.body.name) {
-        return res.status(400).json({ message: "Category name is required." });
+        return sendError(res, "Category name is required.", null, 400);
       } else {
         const savedData = {
           name: req.body.name.trim(),
         };
         let data = await CategoryRepository.save(savedData);
         if (data && data._id) {
-          return res
-            .status(201)
-            .json({ message: "Category created successfully.", data });
+          return sendSuccess(res, "Category created successfully.", data, 201);
         } else {
-          return res.status(500).json({ message: "Internal Server Error" });
+          return sendError(res, "Internal Server Error", null, 500);
         }
       }
     } catch (err) {
-      return res.status(500).json({ message: "Internal Server Error" });
+      console.error("CreateCategory Error:", err);
+      return sendError(res, "Internal Server Error", null, 500);
     }
   }
 
   async getAll(req, res) {
     try {
       let data = await CategoryRepository.findAll();
-      if (data.length > 0) {
-        return res
-          .status(200)
-          .json({ message: "Category fetched successfully.", data });
+      if (data && data.length > 0) {
+        return sendSuccess(res, "Category fetched successfully.", data, 200);
       } else {
-        return res.status(200).json({ message: "Category not found.", data });
+        return sendSuccess(res, "Category not found.", [], 200);
       }
     } catch (err) {
-      return res.status(500).json({ message: "Internal Server Error" });
+      console.error("GetAllCategory Error:", err);
+      return sendError(res, "Internal Server Error", null, 500);
     }
   }
 
@@ -43,14 +42,13 @@ class CategoryController {
       const { id } = req.params;
       let data = await CategoryRepository.update(id, req.body);
       if (data && data._id) {
-        return res
-          .status(200)
-          .json({ message: "Category updated successfully", data });
+        return sendSuccess(res, "Category updated successfully", data, 200);
       } else {
-        return res.status(500).json({ message: "Internal server error" });
+        return sendError(res, "Internal server error", null, 500);
       }
     } catch (err) {
-      return res.status(500).json({ message: "Internal Server Error" });
+      console.error("UpdateCategory Error:", err);
+      return sendError(res, "Internal Server Error", null, 500);
     }
   }
 
@@ -59,16 +57,13 @@ class CategoryController {
       const { id } = req.params;
       let data = await CategoryRepository.delete(id);
       if (!data) {
-        return res.status(404).json({
-          message: "Category not found",
-        });
+        return sendError(res, "Category not found", null, 404);
       }
 
-      return res
-        .status(200)
-        .json({ message: "Category deleted successfully." });
+      return sendSuccess(res, "Category deleted successfully.", data, 200);
     } catch (err) {
-      return res.status(500).json({ message: "Internal Server Error" });
+      console.error("DeleteCategory Error:", err);
+      return sendError(res, "Internal Server Error", null, 500);
     }
   }
 
@@ -77,14 +72,13 @@ class CategoryController {
       const { id } = req.params;
       let data = await CategoryRepository.findById(id);
       if (data && data._id) {
-        res
-          .status(200)
-          .json({ message: "Category fetched successfully.", data });
+        return sendSuccess(res, "Category fetched successfully.", data, 200);
       } else {
-        res.status(200).json({ message: "Category not found.", data });
+        return sendError(res, "Category not found.", null, 404);
       }
     } catch (err) {
-      return res.status(500).json({ message: "Internal Server Error" });
+      console.error("GetCategoryById Error:", err);
+      return sendError(res, "Internal Server Error", null, 500);
     }
   }
 }

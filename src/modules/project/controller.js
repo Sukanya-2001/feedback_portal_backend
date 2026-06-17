@@ -1,20 +1,39 @@
 import { projectValidationSchema } from "./project.validation.js";
 import projectRepository from "./repositories.js";
 import authRepository from "../auth/repositories.js";
+import { sendSuccess, sendError } from "../../utils/response.js";
 
 export const createProject = async (req, res) => {
   try {
+    if (req.file) {
+      req.body.image = `/uploads/${req.file.filename}`;
+    }
+    console.log(req.body);
+
+    // if (typeof req.body.categories === "string") {
+    //   try {
+    //     req.body.categories = JSON.parse(req.body.categories);
+    //   } catch (e) {
+    //     req.body.categories = req.body.categories
+    //       .split(",")
+    //       .map((c) => c.trim())
+    //       .filter(Boolean);
+    //   }
+    // }
+
     const validate = projectValidationSchema.safeParse(req.body);
     if (!validate.success) {
-      return res.status(400).json({
-        success: false,
-        errors: validate.error.flatten().fieldErrors,
-      });
+      return sendError(
+        res,
+        "Validation failed.",
+        validate.error.flatten().fieldErrors,
+        400,
+      );
     }
     const validatedData = validate.data;
     const user = await authRepository.getUserById(req.user.id);
     if (!user) {
-      return res.status(404).json({ message: "User not found." });
+      return sendError(res, "User not found.", null, 404);
     }
 
     const newData = {
@@ -29,28 +48,48 @@ export const createProject = async (req, res) => {
     const project = await projectRepository.create(newData);
 
     if (project && project._id) {
-      return res.status(201).json({ message: "Project created successfully." });
+      return sendSuccess(res, "Project created successfully.", project, 201);
     } else {
-      return res.status(500).json({ message: "Internal server error." });
+      return sendError(res, "Internal server error.", null, 500);
     }
   } catch (err) {
     console.error("CreateProject Error:", err);
-    return res.status(500).json({ message: "Internal server error." });
+    return sendError(res, "Internal server error.", null, 500);
   }
 };
 
 export const getAllProject = async (req, res) => {
   try {
-    const projects = await projectRepository.getAll();
+    const page = req.query.page || 1;
+    const limit = req.query.limit || 10;
+    const userId = req.user.id || null;
+
+    const projects = await projectRepository.getAll(page, limit, userId);
     if (!projects) {
-      return res.status(200).json({ message: "No projects found" });
+      return sendSuccess(res, "No projects found", [], 200);
     } else {
-      return res
-        .status(200)
-        .json({ message: "Projects fetched successfully", data: projects });
+      return sendSuccess(res, "Projects fetched successfully", projects, 200);
     }
   } catch (err) {
-    return res.status(500).json({ message: "Internal server error." });
+    console.error("GetAllProject Error:", err);
+    return sendError(res, "Internal server error.", null, 500);
+  }
+};
+
+export const getAllUsersProject = async (req, res) => {
+  try {
+    const page = req.query.page || 1;
+    const limit = req.query.limit || 10;
+
+    const projects = await projectRepository.getAll(page, limit);
+    if (!projects) {
+      return sendSuccess(res, "No projects found", [], 200);
+    } else {
+      return sendSuccess(res, "Projects fetched successfully", projects, 200);
+    }
+  } catch (err) {
+    console.error("GetAllProject Error:", err);
+    return sendError(res, "Internal server error.", null, 500);
   }
 };
 
@@ -59,38 +98,61 @@ export const getProjectById = async (req, res) => {
     const { id } = req.params;
     let project = await projectRepository.getById(id);
     if (project && project._id) {
-      return res
-        .status(200)
-        .json({ message: "Project fetched successfully.", data: project });
+      return sendSuccess(res, "Project fetched successfully.", project, 200);
     } else {
-      return res.status(200).json({ message: "Project not found." });
+      return sendError(res, "Project not found.", null, 404);
     }
   } catch (err) {
-    return res.status(500).json({ message: "Internal server error" });
+    console.error("GetProjectById Error:", err);
+    return sendError(res, "Internal server error", null, 500);
   }
 };
 
 export const updateProject = async (req, res) => {
   try {
+    const { id } = req.params;
+    let existingProject = await projectRepository.getById(id);
+    if (!existingProject) {
+      return sendError(res, "Project not found.", null, 404);
+    }
+
+    if (req.file) {
+      req.body.image = `/uploads/${req.file.filename}`;
+    } else if (!req.body.image) {
+      req.body.image = existingProject.image;
+    }
+
+    if (typeof req.body.categories === "string") {
+      try {
+        req.body.categories = JSON.parse(req.body.categories);
+      } catch (e) {
+        req.body.categories = req.body.categories
+          .split(",")
+          .map((c) => c.trim())
+          .filter(Boolean);
+      }
+    }
+
     const validate = projectValidationSchema.safeParse(req.body);
     if (!validate.success) {
-      return res.status(400).json({
-        success: false,
-        errors: validate.error.flatten().fieldErrors,
-      });
+      return sendError(
+        res,
+        "Validation failed.",
+        validate.error.flatten().fieldErrors,
+        400,
+      );
     }
     const validatedData = validate.data;
-    const { id } = req.params;
     const project = await projectRepository.update(id, validatedData);
 
     if (project && project._id) {
-      return res.status(200).json({ message: "Project updated successfully." });
+      return sendSuccess(res, "Project updated successfully.", project, 200);
     } else {
-      return res.status(500).json({ message: "Internal server error." });
+      return sendError(res, "Internal server error.", null, 500);
     }
   } catch (err) {
     console.error("UpdateProject Error:", err);
-    return res.status(500).json({ message: "Internal server error" });
+    return sendError(res, "Internal server error", null, 500);
   }
 };
 
@@ -100,11 +162,17 @@ export const deleteProject = async (req, res) => {
     let deletedData = await projectRepository.deleteById(id);
 
     if (deletedData && deletedData._id) {
-      return res.status(200).json({ message: "Project Deleted successfully." });
+      return sendSuccess(
+        res,
+        "Project Deleted successfully.",
+        deletedData,
+        200,
+      );
     } else {
-      return res.status(500).json({ message: "Internal server error." });
+      return sendError(res, "Internal server error.", null, 500);
     }
   } catch (err) {
-    return res.status(500).json({ message: "Internal server error." });
+    console.error("DeleteProject Error:", err);
+    return sendError(res, "Internal server error.", null, 500);
   }
 };

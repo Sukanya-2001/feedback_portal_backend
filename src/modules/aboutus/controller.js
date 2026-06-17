@@ -1,15 +1,12 @@
 import aboutRepository from "./repositories.js";
+import { sendSuccess, sendError } from "../../utils/response.js";
 
 export const aboutCreqate = async (req, res) => {
   try {
     if (!req.body.title.trim()) {
-      return res.status(400).json({
-        message: "Title is required.",
-      });
+      return sendError(res, "Title is required.", null, 400);
     } else if (!req.body.description.trim()) {
-      return res.status(400).json({
-        message: "Description is required.",
-      });
+      return sendError(res, "Description is required.", null, 400);
     } else {
       const newAbout = {
         title: req.body.title.trim(),
@@ -18,19 +15,13 @@ export const aboutCreqate = async (req, res) => {
 
       let data = await aboutRepository.create(newAbout);
       if (data || data._id) {
-        return res.status(200).json({
-          message: "Data saved successfully",
-          data,
-        });
+        return sendSuccess(res, "Data saved successfully", data, 200);
       } else {
-        return res.status(500).json({
-          message: "Internal Server error",
-        });
+        return sendError(res, "Internal Server error", null, 500);
       }
     }
   } catch (error) {
-    res.status(500).json({
-      message: error.message,
-    });
+    console.error("AboutCreate Error:", error);
+    return sendError(res, error.message, null, 500);
   }
 };

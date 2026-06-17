@@ -1,4 +1,4 @@
-import Catgory from "./Models";
+import Catgory from "./model.js";
 
 class CategoryRepository {
   async save(data) {

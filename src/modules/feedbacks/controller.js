@@ -1,5 +1,6 @@
 import FeedbackRepository from "./repositories.js";
 import { feedbackValidation } from "./validation.js";
+import { sendSuccess, sendError } from "../../utils/response.js";
 
 class FeedbackController {
   async create(req, res) {
@@ -7,12 +8,7 @@ class FeedbackController {
       const validate = feedbackValidation.safeParse(req.body);
 
       if (!validate.success) {
-        return res
-          .status(400)
-          .json({
-            success: false,
-            errors: validate.error.flatten().fieldErrors,
-          });
+        return sendError(res, "Validation failed.", validate.error.flatten().fieldErrors, 400);
       } else {
         const savedData = {
           projectId: validate.data.projectId,
@@ -22,15 +18,14 @@ class FeedbackController {
         };
         let data = await FeedbackRepository.save(savedData);
         if (data && data._id) {
-          return res
-            .status(201)
-            .json({ message: "Feedback posted successfully.", data });
+          return sendSuccess(res, "Feedback posted successfully.", data, 201);
         } else {
-          return res.status(500).json({ message: "Internal Server Error" });
+          return sendError(res, "Internal Server Error", null, 500);
         }
       }
     } catch (err) {
-      return res.status(500).json({ message: "Internal Server Error" });
+      console.error("CreateFeedback Error:", err);
+      return sendError(res, "Internal Server Error", null, 500);
     }
   }
 
@@ -38,15 +33,14 @@ class FeedbackController {
     try {
       let { projectId } = req.params;
       let data = await FeedbackRepository.findAll(projectId);
-      if (data.length > 0) {
-        return res
-          .status(200)
-          .json({ message: "Feedback fetched successfully.", data });
+      if (data && data.length > 0) {
+        return sendSuccess(res, "Feedback fetched successfully.", data, 200);
       } else {
-        return res.status(200).json({ message: "Feedback not found.", data });
+        return sendSuccess(res, "Feedback not found.", [], 200);
       }
     } catch (err) {
-      return res.status(500).json({ message: "Internal Server Error" });
+      console.error("GetAllFeedback Error:", err);
+      return sendError(res, "Internal Server Error", null, 500);
     }
   }
 
@@ -55,15 +49,12 @@ class FeedbackController {
       const { feedbackId } = req.params;
       let data = await FeedbackRepository.update(feedbackId, req.body);
       if (data && data._id) {
-        return res
-          .status(200)
-          .json({ message: "Feedback updated successfully", data });
+        return sendSuccess(res, "Feedback updated successfully", data, 200);
       }
-      return res.status(404).json({
-        message: "Feedback not found",
-      });
+      return sendError(res, "Feedback not found", null, 404);
     } catch (err) {
-      return res.status(500).json({ message: "Internal Server Error" });
+      console.error("UpdateFeedback Error:", err);
+      return sendError(res, "Internal Server Error", null, 500);
     }
   }
 
@@ -72,16 +63,13 @@ class FeedbackController {
       const { feedbackId } = req.params;
       let data = await FeedbackRepository.delete(feedbackId);
       if (!data) {
-        return res.status(404).json({
-          message: "Feedback not found",
-        });
+        return sendError(res, "Feedback not found", null, 404);
       }
 
-      return res
-        .status(200)
-        .json({ message: "Feedback deleted successfully." });
+      return sendSuccess(res, "Feedback deleted successfully.", data, 200);
     } catch (err) {
-      return res.status(500).json({ message: "Internal Server Error" });
+      console.error("DeleteFeedback Error:", err);
+      return sendError(res, "Internal Server Error", null, 500);
     }
   }
 
@@ -89,7 +77,7 @@ class FeedbackController {
     try {
       const { feedbackId } = req.params;
       if (!req.body.comment?.trim()) {
-        return res.status(400).json({ message: "Comment is required" });
+        return sendError(res, "Comment is required", null, 400);
       } else {
         const newData = {
           reply: {
@@ -99,15 +87,14 @@ class FeedbackController {
         };
         let data = await FeedbackRepository.update(feedbackId, newData);
         if (data && data._id) {
-          return res
-            .status(201)
-            .json({ message: "Reply posted successfully.", data });
+          return sendSuccess(res, "Reply posted successfully.", data, 201);
         } else {
-          return res.status(500).json({ message: "Internal Server Error" });
+          return sendError(res, "Internal Server Error", null, 500);
         }
       }
     } catch (err) {
-      return res.status(500).json({ message: "Internal Server Error" });
+      console.error("PostReply Error:", err);
+      return sendError(res, "Internal Server Error", null, 500);
     }
   }
 }

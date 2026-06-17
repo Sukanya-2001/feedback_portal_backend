@@ -32,4 +32,4 @@ const authSchema = new mongoose.Schema(
   },
 );
 
-export default mongoose.model("user", authSchema);
+export default mongoose.model("users", authSchema);

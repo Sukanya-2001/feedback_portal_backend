@@ -26,14 +26,16 @@ const projectSchema = new mongoose.Schema(
       trim: true,
     },
 
-    categories: {
-      type: [String],
-      required: true,
-    },
+    categories: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Category",
+      },
+    ],
 
     userId: {
-      type: String,
-      required: true,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "users",
     },
 
     userName: {
@@ -50,7 +52,7 @@ const projectSchema = new mongoose.Schema(
   {
     timestamps: true,
     collection: "projects",
-  }
+  },
 );
 
 export default mongoose.model("Project", projectSchema);
