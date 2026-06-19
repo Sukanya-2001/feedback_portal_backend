@@ -13,7 +13,7 @@ import { authMiddleware } from "../middleware/auth.js";
 import {
   createProject,
   getAllProject,
-  getProjectById,
+  getProjectBySlug,
   updateProject,
   deleteProject,
   getAllUsersProject,
@@ -44,11 +44,15 @@ router.post(
   createProject,
 );
 router.get("/projects/getall", authMiddleware, getAllProject);
-router.get("/projects/:id", authMiddleware, getProjectById);
-router.patch("/projects/:id", authMiddleware, upload.single("image"), updateProject);
+router.get("/projects/:slug", getProjectBySlug);
+router.patch(
+  "/projects/:id",
+  authMiddleware,
+  upload.single("image"),
+  updateProject,
+);
 router.delete("/projects/:id", authMiddleware, deleteProject);
 router.get("/allProjects", getAllUsersProject);
-
 
 //Category
 router.post("/categories/create", CategoryController.create);
@@ -59,13 +63,18 @@ router.get("/categories/:id", CategoryController.getById);
 
 //Feedback
 router.post("/feedbacks/create", FeedbackController.create);
-router.get("/feedbacks/getall/:project_id", FeedbackController.getAll);
+router.get("/feedbacks/getall/:project_slug", FeedbackController.getAll);
 router.patch("/feedbacks/update/:feedback_id", FeedbackController.update);
 router.delete("/feedbacks/:feedback_id", FeedbackController.delete);
 router.patch(
   "/feedbacks/reply/update/:feedback_id",
   authMiddleware,
   FeedbackController.postreply,
+);
+router.patch(
+  "/feedbacks/save/:feedback_id",
+  authMiddleware,
+  FeedbackController.saveFeedback,
 );
 
 export default router;

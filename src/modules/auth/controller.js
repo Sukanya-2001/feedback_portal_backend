@@ -1,7 +1,7 @@
 import {
   genarateAccessToken,
   genarateRefreshToken,
-} from "../../utils/utils.js";
+} from "../../utils/jwtToken.js";
 import bcrypt from "bcryptjs";
 import authRepository from "./repositories.js";
 import { loginValidationSchema } from "./login.validation.js";

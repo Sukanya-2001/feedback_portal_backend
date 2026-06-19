@@ -44,6 +44,13 @@ const projectSchema = new mongoose.Schema(
       trim: true,
     },
 
+    slug: {
+      type: String,
+      required: true,
+      unique: true,
+      index: true,
+    },
+
     isDeleted: {
       type: Boolean,
       default: false,

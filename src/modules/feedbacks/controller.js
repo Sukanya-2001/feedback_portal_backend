@@ -5,14 +5,21 @@ import { sendSuccess, sendError } from "../../utils/response.js";
 class FeedbackController {
   async create(req, res) {
     try {
+      console.log(req.body);
       const validate = feedbackValidation.safeParse(req.body);
+      console.log(validate);
 
       if (!validate.success) {
-        return sendError(res, "Validation failed.", validate.error.flatten().fieldErrors, 400);
+        return sendError(
+          res,
+          "Validation failed.",
+          validate.error.flatten().fieldErrors,
+          400,
+        );
       } else {
         const savedData = {
           projectId: validate.data.projectId,
-          userName: validate.data.userName,
+          guestName: validate.data.guestName,
           guestEmail: validate.data.guestEmail,
           feedback: validate.data.feedback,
         };
@@ -31,12 +38,19 @@ class FeedbackController {
 
   async getAll(req, res) {
     try {
-      let { projectId } = req.params;
-      let data = await FeedbackRepository.findAll(projectId);
-      if (data && data.length > 0) {
+      const { project_slug: slug } = req.params;
+      const page = parseInt(req.query.page) || 1;
+      const limit = parseInt(req.query.limit) || 10;
+      let data = await FeedbackRepository.findAll(page, limit, slug);
+      if (data && data.feedbacks && data.feedbacks.length > 0) {
         return sendSuccess(res, "Feedback fetched successfully.", data, 200);
       } else {
-        return sendSuccess(res, "Feedback not found.", [], 200);
+        return sendSuccess(
+          res,
+          "Feedback not found.",
+          { feedbacks: [], page, limit, total: 0, totalPages: 0 },
+          200,
+        );
       }
     } catch (err) {
       console.error("GetAllFeedback Error:", err);
@@ -75,7 +89,7 @@ class FeedbackController {
 
   async postreply(req, res) {
     try {
-      const { feedbackId } = req.params;
+      const { feedback_id } = req.params;
       if (!req.body.comment?.trim()) {
         return sendError(res, "Comment is required", null, 400);
       } else {
@@ -85,7 +99,8 @@ class FeedbackController {
             created_at: new Date(),
           },
         };
-        let data = await FeedbackRepository.update(feedbackId, newData);
+        console.log(feedback_id, newData, "HEREE");
+        let data = await FeedbackRepository.update(feedback_id, newData);
         if (data && data._id) {
           return sendSuccess(res, "Reply posted successfully.", data, 201);
         } else {
@@ -94,6 +109,20 @@ class FeedbackController {
       }
     } catch (err) {
       console.error("PostReply Error:", err);
+      return sendError(res, "Internal Server Error", null, 500);
+    }
+  }
+
+  async saveFeedback(req, res) {
+    try {
+      const { feedback_id } = req.params;
+      let data = await FeedbackRepository.toggleSave(feedback_id);
+      if (data && data._id) {
+        return sendSuccess(res, "Feedback Status successfully.", data, 200);
+      } else {
+        return sendError(res, "Internal Server Error", null, 500);
+      }
+    } catch (err) {
       return sendError(res, "Internal Server Error", null, 500);
     }
   }

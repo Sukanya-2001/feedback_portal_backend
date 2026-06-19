@@ -1,4 +1,5 @@
 import Feedback from "./model.js";
+import project from "../project/model.js";
 
 class FeedbackRepository {
   async save(data) {
@@ -6,12 +7,27 @@ class FeedbackRepository {
     return savedData;
   }
 
-  async findAll(projectId) {
-    let findData = await Feedback.find({
-      projectId: projectId,
+  async findAll(page = 1, limit = 10, slug) {
+    const skip = (page - 1) * limit;
+    const filter = {
       isDeleted: false,
-    });
-    return findData;
+    };
+    const projectId = await project.findOne({ slug });
+
+    if (projectId) {
+      filter.projectId = projectId;
+    }
+    const [feedbacks, total] = await Promise.all([
+      Feedback.find(filter).sort({ createdAt: -1 }).skip(skip).limit(limit),
+      Feedback.countDocuments(filter),
+    ]);
+    return {
+      feedbacks,
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit),
+    };
   }
 
   async update(feedbackId, data) {
@@ -28,6 +44,19 @@ class FeedbackRepository {
       isDeleted: true,
     });
     return deletedData;
+  }
+
+  async toggleSave(feedbackId) {
+    let findData = await Feedback.findById(feedbackId);
+    let updateData = await Feedback.findByIdAndUpdate(
+      feedbackId,
+      {
+        isSaved: !findData.isSaved,
+      },
+      { new: true },
+    );
+    console.log(findData, updateData, "GTGTGG");
+    return updateData;
   }
 }
 

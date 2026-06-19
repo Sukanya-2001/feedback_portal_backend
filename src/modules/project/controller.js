@@ -2,24 +2,13 @@ import { projectValidationSchema } from "./project.validation.js";
 import projectRepository from "./repositories.js";
 import authRepository from "../auth/repositories.js";
 import { sendSuccess, sendError } from "../../utils/response.js";
+import { generateSlug } from "../../utils/slugGenerator.js";
 
 export const createProject = async (req, res) => {
   try {
     if (req.file) {
       req.body.image = `/uploads/${req.file.filename}`;
     }
-    console.log(req.body);
-
-    // if (typeof req.body.categories === "string") {
-    //   try {
-    //     req.body.categories = JSON.parse(req.body.categories);
-    //   } catch (e) {
-    //     req.body.categories = req.body.categories
-    //       .split(",")
-    //       .map((c) => c.trim())
-    //       .filter(Boolean);
-    //   }
-    // }
 
     const validate = projectValidationSchema.safeParse(req.body);
     if (!validate.success) {
@@ -35,7 +24,8 @@ export const createProject = async (req, res) => {
     if (!user) {
       return sendError(res, "User not found.", null, 404);
     }
-
+    const slug = generateSlug(validatedData.projectName);
+    console.log(slug);
     const newData = {
       projectName: validatedData.projectName,
       description: validatedData.description,
@@ -44,6 +34,7 @@ export const createProject = async (req, res) => {
       categories: validatedData.categories,
       userId: user._id,
       userName: user.fullName,
+      slug: slug,
     };
     const project = await projectRepository.create(newData);
 
@@ -93,10 +84,10 @@ export const getAllUsersProject = async (req, res) => {
   }
 };
 
-export const getProjectById = async (req, res) => {
+export const getProjectBySlug = async (req, res) => {
   try {
-    const { id } = req.params;
-    let project = await projectRepository.getById(id);
+    const { slug } = req.params;
+    let project = await projectRepository.getBySlug(slug);
     if (project && project._id) {
       return sendSuccess(res, "Project fetched successfully.", project, 200);
     } else {

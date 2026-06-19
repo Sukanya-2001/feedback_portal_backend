@@ -1,4 +1,5 @@
 import project from "./model.js";
+import Feedback from "../feedbacks/model.js";
 
 class projectRepository {
   async create(data) {
@@ -8,13 +9,15 @@ class projectRepository {
 
   async getAll(page = 1, limit = 10, userId) {
     const skip = (page - 1) * limit;
-    const filter = {
-    isDeleted: false,
-  };
 
-  if (userId) {
-    filter.userId = userId;
-  }
+    const filter = {
+      isDeleted: false,
+    };
+
+    if (userId) {
+      filter.userId = userId;
+    }
+
     const [projects, total] = await Promise.all([
       project
         .find(filter)
@@ -23,10 +26,38 @@ class projectRepository {
         .skip(skip)
         .limit(limit),
 
-      project.countDocuments(),
+      project.countDocuments(filter),
     ]);
+
+    const projectIds = projects.map((p) => p._id);
+
+    const feedbackCounts = await Feedback.aggregate([
+      {
+        $match: {
+          projectId: { $in: projectIds },
+        },
+      },
+      {
+        $group: {
+          _id: "$projectId",
+          count: { $sum: 1 },
+        },
+      },
+    ]);
+
+    const feedbackCountMap = {};
+
+    feedbackCounts.forEach((item) => {
+      feedbackCountMap[item._id.toString()] = item.count;
+    });
+
+    const projectsWithFeedbackCount = projects.map((p) => ({
+      ...p.toObject(),
+      feedbackCount: feedbackCountMap[p._id.toString()] || 0,
+    }));
+
     return {
-      projects,
+      projects: projectsWithFeedbackCount,
       page,
       limit,
       total,
@@ -34,8 +65,10 @@ class projectRepository {
     };
   }
 
-  async getById(id) {
-    let getData = await project.findById(id).populate("categories", "name");
+  async getBySlug(slug) {
+    let getData = await project
+      .findOne({ slug })
+      .populate("categories", "name");
     return getData;
   }
 

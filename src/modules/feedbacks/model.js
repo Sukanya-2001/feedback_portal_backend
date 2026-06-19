@@ -5,9 +5,8 @@ const feedbackSchema = new mongoose.Schema(
     projectId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "projects",
-      required: true,
     },
-    userName: {
+    guestName: {
       type: String,
       trim: true,
     },

@@ -2,19 +2,19 @@ import { z } from "zod";
 import mongoose from "mongoose";
 
 export const feedbackValidation = z.object({
-  project_id: z
+  projectId: z
     .string()
     .refine((id) => mongoose.Types.ObjectId.isValid(id), {
       message: "Invalid project ID",
     }),
 
-  user_name: z
+  guestName: z
     .string()
     .trim()
     .min(1, "User name is required")
     .optional(),
 
-  guest_email: z
+  guestEmail: z
     .string()
     .trim()
     .email("Please provide a valid email")
