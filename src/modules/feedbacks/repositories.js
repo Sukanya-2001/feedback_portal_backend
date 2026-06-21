@@ -7,7 +7,7 @@ class FeedbackRepository {
     return savedData;
   }
 
-  async findAll(page = 1, limit = 10, slug, isSaved) {
+  async findAll(page = 1, limit = 10, slug, isSaved, sortBy, search) {
     const skip = (page - 1) * limit;
     const filter = {
       isDeleted: false,
@@ -20,8 +20,20 @@ class FeedbackRepository {
     if (isSaved) {
       filter.isSaved = isSaved;
     }
+
+    const sortFilter = {
+      createdAt: sortBy === "oldest" ? 1 : -1,
+    };
+
+    if (search?.trim()) {
+      filter.$or = [
+        { guestName: { $regex: search, $options: "i" } },
+        { guestEmail: { $regex: search, $options: "i" } },
+        { feedback: { $regex: search, $options: "i" } },
+      ];
+    }
     const [feedbacks, total] = await Promise.all([
-      Feedback.find(filter).sort({ createdAt: -1 }).skip(skip).limit(limit),
+      Feedback.find(filter).sort(sortFilter).skip(skip).limit(limit),
       Feedback.countDocuments(filter),
     ]);
     return {

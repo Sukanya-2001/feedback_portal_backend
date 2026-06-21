@@ -51,11 +51,13 @@ export const createProject = async (req, res) => {
 
 export const getAllProject = async (req, res) => {
   try {
-    const page = req.query.page || 1;
-    const limit = req.query.limit || 10;
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const category = req.query.category;
+    const search = req.query.search;
     const userId = req.user.id || null;
 
-    const projects = await projectRepository.getAll(page, limit, userId);
+    const projects = await projectRepository.getAll(page, limit, userId, category, search);
     if (!projects) {
       return sendSuccess(res, "No projects found", [], 200);
     } else {
@@ -134,6 +136,7 @@ export const updateProject = async (req, res) => {
       );
     }
     const validatedData = validate.data;
+    console.log(validatedData, 'validatedData')
     const project = await projectRepository.update(id, validatedData);
 
     if (project && project._id) {

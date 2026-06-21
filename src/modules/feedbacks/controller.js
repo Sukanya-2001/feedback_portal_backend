@@ -40,11 +40,13 @@ class FeedbackController {
     try {
       const { project_slug: slug } = req.params;
       const saved = req.query.saved;
+      const sortBy = req.query.sortBy;
+      const search = req.query.search;
       const page = parseInt(req.query.page) || 1;
       const limit = parseInt(req.query.limit) || 10;
       const isSaved = saved === "true";
       console.log(saved, "SAVED");
-      let data = await FeedbackRepository.findAll(page, limit, slug, isSaved);
+      let data = await FeedbackRepository.findAll(page, limit, slug, isSaved, sortBy, search);
       if (data && data.feedbacks && data.feedbacks.length > 0) {
         return sendSuccess(res, "Feedback fetched successfully.", data, 200);
       } else {
