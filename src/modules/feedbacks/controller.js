@@ -39,9 +39,12 @@ class FeedbackController {
   async getAll(req, res) {
     try {
       const { project_slug: slug } = req.params;
+      const saved = req.query.saved;
       const page = parseInt(req.query.page) || 1;
       const limit = parseInt(req.query.limit) || 10;
-      let data = await FeedbackRepository.findAll(page, limit, slug);
+      const isSaved = saved === "true";
+      console.log(saved, "SAVED");
+      let data = await FeedbackRepository.findAll(page, limit, slug, isSaved);
       if (data && data.feedbacks && data.feedbacks.length > 0) {
         return sendSuccess(res, "Feedback fetched successfully.", data, 200);
       } else {
@@ -121,6 +124,24 @@ class FeedbackController {
         return sendSuccess(res, "Feedback Status successfully.", data, 200);
       } else {
         return sendError(res, "Internal Server Error", null, 500);
+      }
+    } catch (err) {
+      return sendError(res, "Internal Server Error", null, 500);
+    }
+  }
+
+  async getSavedFeedbacks(req, res) {
+    try {
+      let allData = await FeedbackRepository.allSavedFeedback();
+      if (allData && allData.length > 0) {
+        return sendSuccess(
+          res,
+          "Feedbacks fetched successfully.",
+          allData,
+          200,
+        );
+      } else {
+        return sendSuccess(res, "No saved feedbacks found.", [], 200);
       }
     } catch (err) {
       return sendError(res, "Internal Server Error", null, 500);

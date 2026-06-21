@@ -140,11 +140,31 @@ export const getProfile = async (req, res) => {
     let userProfile = user.toObject();
     delete userProfile.password;
 
-    return sendSuccess(res, "User profile retrives successfully", 
-      userProfile,
-    );
+    return sendSuccess(res, "User profile retrives successfully", userProfile);
   } catch (err) {
     console.error("GetProfile Error:", err);
+    return sendError(res, "Internal server error.", null, 502);
+  }
+};
+
+export const updateProfile = async (req, res) => {
+  try {
+    if (!req.user.id) {
+      return sendError(res, "User not found", null, 400);
+    }
+    if(req.file){
+      req.body.image = `/uploads/profile/${req.file.filename}`
+    }
+
+    const data = {
+      fullName: req.body.fullName,
+      image: req.body.image
+    }
+
+    let userData = await authRepository.updateUser(req.user.id, data);
+    delete userData.password;
+    return sendSuccess(res, "User profile retrives successfully", userData);
+  } catch (err) {
     return sendError(res, "Internal server error.", null, 502);
   }
 };

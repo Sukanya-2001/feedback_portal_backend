@@ -8,6 +8,7 @@ import {
   verifyOtp,
   resetPassword,
   changePassword,
+  updateProfile,
 } from "../modules/auth/controller.js";
 import { authMiddleware } from "../middleware/auth.js";
 import {
@@ -20,9 +21,11 @@ import {
 } from "../modules/project/controller.js";
 import CategoryController from "../modules/categories/controller.js";
 import FeedbackController from "../modules/feedbacks/controller.js";
-import { upload } from "../middleware/upload.js";
+import { createUpload } from "../middleware/upload.js";
 
 const router = express.Router();
+const profileUpload = createUpload("profile");
+const projectUpload = createUpload("projects");
 
 //Auth
 router.post("/auth/signin", signIn);
@@ -34,13 +37,19 @@ router.post("/auth/reset-password", resetPassword);
 // router.post("/auth/verify", verifyEmail);
 // router.post("/reset", resetPassword);
 router.get("/profile", authMiddleware, getProfile);
+router.patch(
+  "/update-profile",
+  authMiddleware,
+  profileUpload.single("image"),
+  updateProfile,
+);
 router.post("/change-password", authMiddleware, changePassword);
 
 //Projects
 router.post(
   "/projects/create",
   authMiddleware,
-  upload.single("image"),
+  projectUpload.single("image"),
   createProject,
 );
 router.get("/projects/getall", authMiddleware, getAllProject);
@@ -48,7 +57,7 @@ router.get("/projects/:slug", getProjectBySlug);
 router.patch(
   "/projects/:id",
   authMiddleware,
-  upload.single("image"),
+  projectUpload.single("image"),
   updateProject,
 );
 router.delete("/projects/:id", authMiddleware, deleteProject);
@@ -75,6 +84,11 @@ router.patch(
   "/feedbacks/save/:feedback_id",
   authMiddleware,
   FeedbackController.saveFeedback,
+);
+router.get(
+  "/savedFeedbacks",
+  authMiddleware,
+  FeedbackController.getSavedFeedbacks,
 );
 
 export default router;

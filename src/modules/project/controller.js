@@ -7,7 +7,7 @@ import { generateSlug } from "../../utils/slugGenerator.js";
 export const createProject = async (req, res) => {
   try {
     if (req.file) {
-      req.body.image = `/uploads/${req.file.filename}`;
+      req.body.image = `/uploads/projects/${req.file.filename}`;
     }
 
     const validate = projectValidationSchema.safeParse(req.body);
@@ -108,7 +108,7 @@ export const updateProject = async (req, res) => {
     }
 
     if (req.file) {
-      req.body.image = `/uploads/${req.file.filename}`;
+      req.body.image = `/uploads/projects/${req.file.filename}`;
     } else if (!req.body.image) {
       req.body.image = existingProject.image;
     }
