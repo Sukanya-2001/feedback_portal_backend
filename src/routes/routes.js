@@ -22,6 +22,11 @@ import {
 import CategoryController from "../modules/categories/controller.js";
 import FeedbackController from "../modules/feedbacks/controller.js";
 import { createUpload } from "../middleware/upload.js";
+import {
+  getDashboardCount,
+  getDashboardGraph,
+  getRecentFeedback,
+} from "../modules/dashboard/controller.js";
 
 const router = express.Router();
 const profileUpload = createUpload("profile");
@@ -44,6 +49,11 @@ router.patch(
   updateProfile,
 );
 router.post("/change-password", authMiddleware, changePassword);
+
+//Dashboard
+router.get("/dashboard-count", authMiddleware, getDashboardCount);
+router.get("/dashboard-graph", authMiddleware, getDashboardGraph);
+router.get("/recent-feedbacks", authMiddleware, getRecentFeedback);
 
 //Projects
 router.post(
