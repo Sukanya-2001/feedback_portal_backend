@@ -25,7 +25,6 @@ export const createProject = async (req, res) => {
       return sendError(res, "User not found.", null, 404);
     }
     const slug = generateSlug(validatedData.projectName);
-    console.log(slug);
     const newData = {
       projectName: validatedData.projectName,
       description: validatedData.description,
@@ -136,7 +135,6 @@ export const updateProject = async (req, res) => {
       );
     }
     const validatedData = validate.data;
-    console.log(validatedData, 'validatedData')
     const project = await projectRepository.update(id, validatedData);
 
     if (project && project._id) {

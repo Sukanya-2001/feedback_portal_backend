@@ -5,9 +5,7 @@ import { sendSuccess, sendError } from "../../utils/response.js";
 class FeedbackController {
   async create(req, res) {
     try {
-      console.log(req.body);
       const validate = feedbackValidation.safeParse(req.body);
-      console.log(validate);
 
       if (!validate.success) {
         return sendError(
@@ -45,7 +43,6 @@ class FeedbackController {
       const page = parseInt(req.query.page) || 1;
       const limit = parseInt(req.query.limit) || 10;
       const isSaved = saved === "true";
-      console.log(saved, "SAVED");
       let data = await FeedbackRepository.findAll(
         page,
         limit,
@@ -111,7 +108,6 @@ class FeedbackController {
             created_at: new Date(),
           },
         };
-        console.log(feedback_id, newData, "HEREE");
         let data = await FeedbackRepository.update(feedback_id, newData);
         if (data && data._id) {
           return sendSuccess(res, "Reply posted successfully.", data, 201);

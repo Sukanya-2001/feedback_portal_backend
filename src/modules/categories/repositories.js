@@ -1,23 +1,23 @@
-import Catgory from "./model.js";
+import Category from "./model.js";
 
 class CategoryRepository {
   async save(data) {
-    let savedData = await Catgory.create(data);
+    let savedData = await Category.create(data);
     return savedData;
   }
 
   async findAll() {
-    let findData = await Catgory.find({ isDeleted: false });
+    let findData = await Category.find({ isDeleted: false });
     return findData;
   }
 
   async update(id, data) {
-    let updatedData = await Catgory.findByIdAndUpdate(id, data, { new: true });
+    let updatedData = await Category.findByIdAndUpdate(id, data, { new: true });
     return updatedData;
   }
 
   async delete(id) {
-    let deletedData = await Catgory.findByIdAndUpdate(id, { isDeleted: true });
+    let deletedData = await Category.findByIdAndUpdate(id, { isDeleted: true });
     return deletedData;
   }
 

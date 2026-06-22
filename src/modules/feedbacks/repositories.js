@@ -70,7 +70,6 @@ class FeedbackRepository {
       },
       { new: true },
     );
-    console.log(findData, updateData, "GTGTGG");
     return updateData;
   }
 

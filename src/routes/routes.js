@@ -25,6 +25,9 @@ import { createUpload } from "../middleware/upload.js";
 import {
   getDashboardCount,
   getDashboardGraph,
+  getFeedbackGrowth,
+  getProjectByCategory,
+  getProjectGrowth,
   getRecentFeedback,
 } from "../modules/dashboard/controller.js";
 
@@ -53,6 +56,9 @@ router.post("/change-password", authMiddleware, changePassword);
 //Dashboard
 router.get("/dashboard-count", authMiddleware, getDashboardCount);
 router.get("/dashboard-graph", authMiddleware, getDashboardGraph);
+router.get("/project-by-category", authMiddleware, getProjectByCategory);
+router.get("/feedback-growth", authMiddleware, getFeedbackGrowth);
+router.get("/project-growth", authMiddleware, getProjectGrowth);
 router.get("/recent-feedbacks", authMiddleware, getRecentFeedback);
 
 //Projects

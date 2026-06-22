@@ -22,6 +22,47 @@ export const getDashboardGraph = async (req, res) => {
   }
 };
 
+export const getProjectByCategory = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    if (!userId) {
+      return sendError(res, "User not found", null, 500);
+    }
+    let retrivedData = await dashboardRepository.projectByCategory(userId);
+    return sendSuccess(res, "Data retrived successfully.", retrivedData, 200);
+  } catch (err) {
+    return sendError(res, "Internal Server Error", null, 500);
+  }
+};
+
+export const getFeedbackGrowth = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const range = req.query.range || "monthly";
+    if (!userId) {
+      return sendError(res, "User not found", null, 500);
+    }
+    let retrivedData = await dashboardRepository.FeedbacksGrowth(userId, range);
+    return sendSuccess(res, "Data retrived successfully.", retrivedData, 200);
+  } catch (err) {
+    return sendError(req, "Internal server error.", null, 500);
+  }
+};
+
+export const getProjectGrowth = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const range = req.query.range || "monthly";
+    if (!userId) {
+      return sendError(res, "User not found", null, 500);
+    }
+    let retrivedData = await dashboardRepository.ProjectsGrowth(userId, range);
+    return sendSuccess(res, "Data retrived successfully.", retrivedData, 200);
+  } catch (err) {
+    return sendError(req, "Internal server error.", null, 500);
+  }
+};
+
 export const getRecentFeedback = async (req, res) => {
   try {
     const userId = req.user.id;

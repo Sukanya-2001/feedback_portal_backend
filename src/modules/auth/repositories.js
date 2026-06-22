@@ -32,7 +32,6 @@ class authRepository {
   }
 
   async updateUser(id, data) {
-    console.log(data, 'LOGGG');
     let datas = await user.findByIdAndUpdate(id, data, { new: true });
     return datas;
   }
