@@ -137,7 +137,8 @@ class FeedbackController {
 
   async getSavedFeedbacks(req, res) {
     try {
-      let allData = await FeedbackRepository.allSavedFeedback();
+      const userId = req.user.id;
+      let allData = await FeedbackRepository.allSavedFeedback(userId);
       if (allData && allData.length > 0) {
         return sendSuccess(
           res,

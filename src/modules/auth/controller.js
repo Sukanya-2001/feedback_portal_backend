@@ -26,6 +26,7 @@ export const signUp = async (req, res) => {
       );
     } else {
       const email = req.body.email.trim();
+      console.log(email, 'DATAA')
       const userExist = await authRepository.findByFieldName({ email });
       if (userExist) {
         return sendError(
@@ -43,6 +44,7 @@ export const signUp = async (req, res) => {
       };
 
       let data = await authRepository.userCreate(saveData);
+      console.log(data, 'DATAA')
 
       if (data && data._id) {
         // // Generate a 6-digit OTP
@@ -135,7 +137,7 @@ export const getProfile = async (req, res) => {
   try {
     const user = await authRepository.getUserById(req.user.id);
     if (!user) {
-      return sendError(res, "User not found", null, 400);
+      return sendError(res, "User not found", null, 401);
     }
     let userProfile = user.toObject();
     delete userProfile.password;

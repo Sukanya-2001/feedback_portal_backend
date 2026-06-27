@@ -73,7 +73,7 @@ class FeedbackRepository {
     return updateData;
   }
 
-  async allSavedFeedback() {
+  async allSavedFeedback(userId) {
     const feedbackData = await Feedback.aggregate([
       {
         $match: {
@@ -91,6 +91,11 @@ class FeedbackRepository {
       },
       {
         $unwind: "$project",
+      },
+      {
+        $match: {
+          "project.user_id": userId, // or new mongoose.Types.ObjectId(userId)
+        },
       },
       {
         $group: {
