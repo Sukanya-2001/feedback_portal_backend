@@ -7,8 +7,9 @@ class projectRepository {
     return saveData;
   }
 
-  async getAll(page = 1, limit = 10, userId, category, search) {
+  async getAll(page = 1, limit = 10, userId, category, search, sortBy) {
     const skip = (page - 1) * limit;
+    console.log(userId, category, search, sortBy, "HEREREEE");
 
     const filter = {
       isDeleted: false,
@@ -25,10 +26,13 @@ class projectRepository {
       filter.$or = [{ projectName: { $regex: search, $options: "i" } }];
     }
 
+    const sortOption =
+      sortBy === "newest" ? { createdAt: -1 } : { createdAt: 1 };
+
     const [projects, total] = await Promise.all([
       project
         .find(filter)
-        .sort({createdAt: -1})
+        .sort(sortOption)
         .populate("userId", "fullName email")
         .populate("categories", "name")
         .skip(skip)
@@ -36,6 +40,8 @@ class projectRepository {
 
       project.countDocuments(filter),
     ]);
+
+    console.log(projects, "projects1");
 
     const projectIds = projects.map((p) => p._id);
 

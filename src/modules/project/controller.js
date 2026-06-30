@@ -81,8 +81,18 @@ export const getAllUsersProject = async (req, res) => {
   try {
     const page = req.query.page || 1;
     const limit = req.query.limit || 10;
+    const sortBy = req.query.sortBy || "newest";
+    const category = req.query.category;
+    const search = req.query.search;
 
-    const projects = await projectRepository.getAll(page, limit);
+    const projects = await projectRepository.getAll(
+      page,
+      limit,
+      undefined,
+      category,
+      search,
+      sortBy,
+    );
     if (!projects) {
       return sendSuccess(res, "No projects found", [], 200);
     } else {
