@@ -5,8 +5,6 @@ import connectDB from "../config/db.js";
 import { connectRedis } from "../config/redis.js";
 import router from "./routes/routes.js";
 
-import path from "path";
-
 dotenv.config();
 
 connectDB();
@@ -22,7 +20,6 @@ app.use(
 );
 
 app.use(express.json());
-app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 app.use("/api", router);
 
 app.get("/", (req, res) => {

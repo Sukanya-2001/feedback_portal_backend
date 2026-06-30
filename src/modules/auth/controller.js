@@ -26,7 +26,6 @@ export const signUp = async (req, res) => {
       );
     } else {
       const email = req.body.email.trim();
-      console.log(email, 'DATAA')
       const userExist = await authRepository.findByFieldName({ email });
       if (userExist) {
         return sendError(
@@ -44,14 +43,13 @@ export const signUp = async (req, res) => {
       };
 
       let data = await authRepository.userCreate(saveData);
-      console.log(data, 'DATAA')
 
       if (data && data._id) {
-        // // Generate a 6-digit OTP
+        // Generate a 6-digit OTP
         // const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
         // // Store OTP in Redis with 5 minutes (300 seconds) expiry
-        // await redisClient.set(`otp:verify:${email}`, otp, 'EX', 300);
+        // await redisClient.set(`otp:verify:${email}`, otp, "EX", 300);
 
         // // Send Email
         // await sendOTPEmail(email, otp, "Email Verification Code");
@@ -154,14 +152,14 @@ export const updateProfile = async (req, res) => {
     if (!req.user.id) {
       return sendError(res, "User not found", null, 400);
     }
-    if(req.file){
-      req.body.image = `/uploads/profile/${req.file.filename}`
+    if (req.file) {
+      req.body.image = req.file.path;
     }
 
     const data = {
       fullName: req.body.fullName,
-      image: req.body.image
-    }
+      image: req.body.image,
+    };
 
     let userData = await authRepository.updateUser(req.user.id, data);
     delete userData.password;
@@ -194,7 +192,7 @@ export const forgotPassword = async (req, res) => {
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
     // Store OTP in Redis with 5 minutes (300 seconds) expiry
-    await redisClient.set(`otp:reset:${email}`, otp, 'EX', 300);
+    await redisClient.set(`otp:reset:${email}`, otp, "EX", 300);
 
     // Send Email
     await sendOTPEmail(email, otp, "Password Reset Code");
@@ -256,7 +254,7 @@ export const verifyOtp = async (req, res) => {
     }
 
     // Store "reset-allowed" flag in Redis (expires in 5 minutes)
-    await redisClient.set(`reset-allowed:${trimmedEmail}`, "true", 'EX', 300);
+    await redisClient.set(`reset-allowed:${trimmedEmail}`, "true", "EX", 300);
 
     // Delete OTP from Redis
     await redisClient.del(`otp:reset:${trimmedEmail}`);
