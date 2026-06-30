@@ -9,6 +9,9 @@ export const createProject = async (req, res) => {
     if (req.file) {
       req.body.image = req.file.path;
     }
+    if (req.body.categories && !Array.isArray(req.body.categories)) {
+      req.body.categories = [req.body.categories];
+    }
 
     const validate = projectValidationSchema.safeParse(req.body);
     if (!validate.success) {
@@ -56,7 +59,13 @@ export const getAllProject = async (req, res) => {
     const search = req.query.search;
     const userId = req.user.id || null;
 
-    const projects = await projectRepository.getAll(page, limit, userId, category, search);
+    const projects = await projectRepository.getAll(
+      page,
+      limit,
+      userId,
+      category,
+      search,
+    );
     if (!projects) {
       return sendSuccess(res, "No projects found", [], 200);
     } else {
