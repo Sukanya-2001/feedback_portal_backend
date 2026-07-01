@@ -9,7 +9,6 @@ class projectRepository {
 
   async getAll(page = 1, limit = 10, userId, category, search, sortBy) {
     const skip = (page - 1) * limit;
-    console.log(userId, category, search, sortBy, "HEREREEE");
 
     const filter = {
       isDeleted: false,
@@ -40,8 +39,6 @@ class projectRepository {
 
       project.countDocuments(filter),
     ]);
-
-    console.log(projects, "projects1");
 
     const projectIds = projects.map((p) => p._id);
 

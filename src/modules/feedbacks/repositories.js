@@ -1,5 +1,6 @@
 import Feedback from "./model.js";
 import project from "../project/model.js";
+import mongoose from "mongoose";
 
 class FeedbackRepository {
   async save(data) {
@@ -94,7 +95,7 @@ class FeedbackRepository {
       },
       {
         $match: {
-          "project.user_id": userId, // or new mongoose.Types.ObjectId(userId)
+          "project.userId": new mongoose.Types.ObjectId(userId),
         },
       },
       {
